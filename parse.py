@@ -982,7 +982,6 @@ for (d) in (
     'bootstrap-3.3.6-dist',
     'bootstrap-rtl-3.3.4',
     'jquery',
-    'fonts',
 ):
     shutil.copytree(d, os.path.join("../output", d))
 
