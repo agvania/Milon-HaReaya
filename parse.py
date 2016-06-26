@@ -85,8 +85,8 @@ if process == "Full":
     #create_latex = True
     create_latex = False
 else:
-    doc_file_name = 'dict_few.docx'
-    #doc_file_name = 'dict_check.docx'
+    #doc_file_name = 'dict_few.docx'
+    doc_file_name = 'dict_check.docx'
     #doc_file_name = 'dict_short.docx'
     #doc_file_name = 'dict.docx'
 
@@ -413,7 +413,7 @@ def analyze_and_fix(para):
         debug_file.write("---------------\n")
         for (type, text) in new_para:
             s = "%s:%s.\n" % (type, text)
-            debug_file.write(s.encode('utf8') + ' ')
+            debug_file.write(s.encode('utf8'))
 
     # fix
     return new_para
@@ -582,7 +582,7 @@ def fix_sz_cs(run, type):
         if run.style.style_id == "s01":
             s = "!Fixed!szCs=%s:%s." % (szCs, run.text)
             # print s
-            debug_file.write(s.encode('utf8') + ' ')
+            debug_file.write(s.encode('utf8'))
             return 'subject_small'
     elif szCs == "22" and type == 'definition_normal':
         return 'subject_normal'
@@ -982,6 +982,7 @@ for (d) in (
     'bootstrap-3.3.6-dist',
     'bootstrap-rtl-3.3.4',
     'jquery',
+    'fonts',
 ):
     shutil.copytree(d, os.path.join("../output", d))
 
@@ -1005,7 +1006,7 @@ with open('output/debug.txt', 'w') as debug_file:
             for (run, footnote_run) in zip(paragraph.runs, footnote_paragraph.runs):
                 s = "!%s.%s:%s$" % (run.style.style_id, styles.get(run_style_id(run), run_style_id(run)), run.text)
                 # print "!%s:%s$" % (styles.get(run.style.style_id, run.style.style_id), run.text)
-                debug_file.write(s.encode('utf8') + ' ')
+                debug_file.write(s.encode('utf8'))
                 type = styles.get(run_style_id(run), "unknown")
 
                 if run.font.size and run.text.strip():
@@ -1057,7 +1058,7 @@ with open('output/debug.txt', 'w') as debug_file:
                         print paragraph.text
                         s = "\nMissing: !%s:%s$\n\n" % (run_style_id(run), run.text)
                         print s
-                        debug_file.write(s.encode('utf8') + ' ')
+                        debug_file.write(s.encode('utf8'))
 
 
                 try:
