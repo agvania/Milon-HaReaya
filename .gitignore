@@ -16,3 +16,9 @@ debug*
 key/
 key.p12
 secret.py
+.metadata*
+.settings*
+.idea*
+.git*
+.project*
+.pydev*
