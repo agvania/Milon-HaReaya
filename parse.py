@@ -9,24 +9,38 @@ If 'secret.py' exists, it then uploads the .zip file to PhoneGap Build, waits fo
 to be ready, downloads it (to output/) and pushes everything (automatically) to Google Play.
 """
 
+# TODO: refactor, split to files, unit tests
+# TODO: why "Pashut" is unknown?
+# TODO: fix "FOOTNOTE undefined: af7 None  :  homo"
+
+# TODO: TEX: handle unbalanced columns
+# TODO: TEX: Mehkarim UVeurim - handle style (w/o numbers...)
+# TODO: TEX: "Psukim KeMusagim" - Moto - last line should be to the left
+# TODO: TEX: "Psukim KeMusagim" - first page - second column - empty line...
+# TODO: TEX: "Psukim KeMusagim" - letters need to be on new page
+# TODO: TEX: 'tex.full' line 8089 failure (8246) - because of "Vav" in "Otiyot" - need to delete previous line, and re-enter
+# TODO: TEX: add prefixes and appendices
+# TODO: TEX: clean milon.tex, handle koma recommendations
+# TODO: TEX: make sure that "fake_subject_normal" is correct - currently different between HTML and LyX
+# TODO: TEX: publish my Tex packages?
+# TODO: create indexes? (both before and after main text...)
+
+# TODO: Clean 'UNKNOWN's and 'fix_sz_cs'
+# TODO: verify that it's running on clean GIT clone
+
 # TODO: Wrap each definition with <div> tag
 # TODO: change 'is_prev_subject(..)' to correctly handle "Toar Shem Tov" - should be more freely checking
-# TODO: "Yoru" - sizes changing
 # TODO: otiyot - stam font
 # TODO: pagination at end
 # TODO: subject_light vs sub-subjet_light - wait for Rav's response
 
-# TODO: "Mishkan UMikdash" - "Korbanot" - "Par" - some are not subjects, and one is a long link
 # TODO: subjects size in Mehkarim
 # TODO: references numbering
 # TODO: search "Natziv" not working
-# TODO: Or HaGaluy (see check.docx)
 # TODO: Yud and Lamed in Psukim
 # TODO: splitted bubject, like "אמר לו הקדוש ברוך הוא (לגבריאל° שבקש להציל את אברהם־אבינו° מכבשן האש) אני יחיד בעולמי והוא יחיד בעולמו, נאה ליחיד להציל את היחיד"
 
 # TODO: circles shouldn't be part of subjects (and what about parentheses?)
-# TODO: double footnote, like #8 - recognize also the second
-# TODO: decrease size of app
 # TODO: breadcrumbs
 # TODO: "Mehkarim" - make links, check styles!
 # TODO: Change "opening_abbrev.html" styling
@@ -42,7 +56,8 @@ to be ready, downloads it (to output/) and pushes everything (automatically) to 
 # TODO: increase/decrease font size
 # TODO: make definition in new line? (without ' - ')
 
-# TODO: Split this file...
+# TODO: replace menu with Bootstrap style menu
+# TODO: Make index.html's links clickable, or copyable
 # TODO: better icon
 # TODO: iphone?
 # TODO: GUI
@@ -54,7 +69,7 @@ to be ready, downloads it (to output/) and pushes everything (automatically) to 
 # (see https://github.com/python-openxml/python-docx/issues/248 )
 # in the meanwhile, I've hacked it locally
 import sys
-#sys.path.insert(0, r'C:\Users\zharamax\PycharmProjects\python-docx')
+sys.path.insert(0, r'C:\Users\Zvika\PycharmProjects\python-docx')
 sys.path.insert(0, r'C:\Users\sdaudi\Github\python-docx')
 
 import docx
@@ -72,12 +87,14 @@ import subprocess
 
 import build_phonegap
 import upload_google_play
+import htmler
+import texer
 
 html_parser = HTMLParser.HTMLParser()
 
-#process = "Full"
-#process = "APK"
-process = "ZIP"
+# process = "APK"
+process = "Full"
+# process = "ZIP"
 
 if process == "Full":
     doc_file_name = 'dict.docx'
@@ -85,13 +102,16 @@ if process == "Full":
     #create_latex = True
     create_latex = False
 else:
-    doc_file_name = 'dict_few.docx'
-    #doc_file_name = 'dict_check.docx'
-    #doc_file_name = 'dict_short.docx'
-    #doc_file_name = 'dict.docx'
+    # doc_file_name = 'dict_few.docx'
+    # doc_file_name = 'dict_check.docx'
+    doc_file_name = 'dict_short.docx'
+    # doc_file_name = 'dict.docx'
 
     create_html = True
     create_latex = False
+
+    # create_html = False
+    # create_latex = True
 
 
 
@@ -103,19 +123,25 @@ word_doc_footnotes = docx_fork_ludoo.Document(doc_file_name)
 # new is preferred, because, well, it's new...
 # old is preferred because I'm using a branch with footnotes support
 def run_style_id(run):
+    bold = ""
+    if run.text.strip() and run.font.cs_bold:
+        # print "BOLD: ", run.bold, run.font.bold, run.font.cs_bold, ": ", run.text
+        bold = "_bold"
     try:
-        return run.style.style_id
+        return run.style.style_id + bold
     except:
         if run.style:
-            return run.style
+            return run.style + bold
         else:
-            return 'DefaultParagraphFont'
+            return 'DefaultParagraphFont' + bold
 
 
 styles = {
     's01': 'subject_normal',
     's11': 'sub-subject_normal',
+    's03_bold': 'sub-subject_small',    #?Fixing appendix  ?
     's02': 'definition_normal',
+    's02_bold': 'definition_normal',     #?Fixing appendix
     's03': 'source_normal',
     'Heading3Char': 'definition_normal',
     '1': 'definition_normal',   #?
@@ -124,11 +150,14 @@ styles = {
 
     # this is problematic! has its own function to handle it
     'DefaultParagraphFont': 'DefaultParagraphFont',
+    'DefaultParagraphFont_bold': 'DefaultParagraphFont',    #TODO: correct?
 
     's15': 'subject_small',
     's17': 'subject_small',
     's1510': 'subject_small',
+    's1510_bold': 'subject_small',
     's05': 'definition_small',
+    's05_bold': 'sub-subject_small',    #?Fixing appendix
     's038': 'source_small',
     's0590': 'source_small',
     's050': 'source_small',
@@ -137,6 +166,7 @@ styles = {
     's149': 'subject_light',
     's14': 'subject_light',
     's16': 'sub-subject_light',
+    's12_bold': 'sub-subject_light',
     's168': 'sub-subject_light',
     's048': 'definition_light',
     's12': 'definition_light',
@@ -147,7 +177,18 @@ styles = {
 
     'FootnoteReference': 'FootnoteReference',
     'EndnoteReference': 'EndnoteReference', #?
+
+    # 17.3.19 - these were added with new Office 365 (2019) - seem like new aliases for existing styles
+    'a0': 'DefaultParagraphFont',
+    'a0_bold': 'DefaultParagraphFont',
+    'a3': 'FootnoteReference',
+    'a7': 'EndnoteReference',
+    '30': 'definition_normal',
+    '11': 'definition_normal',
+    'a6': 'definition_normal',
+    # \17.3.19
 }
+
 
 # if the actual size is greater
 class Sizes:
@@ -213,7 +254,7 @@ def subject(html_doc, type, text):
     #     tags.attr(cls=type)
 
 def regular(type, text):
-    if type in ['footnote', 'footnote_reoccurance']:
+    if type in ['footnote', 'footnote_recurrence']:
         with tags.a("(%s)" % text.strip()):
             tags.attr(cls="ptr")
     else:
@@ -228,11 +269,11 @@ def regular(type, text):
             with tags.span(text):
                 tags.attr(cls=type)
 
-def is_footnote_reoccurance(run, type):
+def is_footnote_recurrence(run, type):
     # a number in superscript, that's not defined as a footnote
     return \
-        and run.element.rPr.vertAlign is not None \
-        type != 'footnote' \
+        run.element.rPr.vertAlign is not None \
+        and type != 'footnote' \
         and run.text.strip().isdigit() \
         and run.element.rPr.vertAlign.values()[0] == 'superscript'
 
@@ -568,11 +609,6 @@ def add_to_output(html_doc, para):
 
         # tags.br()
 
-def add_footnote_to_output(paragraphs):
-    text = ""
-    for (para) in paragraphs:
-        text += para.text
-    tags.li(text)
 
 
 def fix_sz_cs(run, type):
@@ -580,14 +616,32 @@ def fix_sz_cs(run, type):
     szCs = run.element.rPr.szCs.attrib.values()[0]
     if szCs == "20" and 'subject' in type:
         if run.style.style_id == "s01":
-            s = "!Fixed!szCs=%s:%s." % (szCs, run.text)
+            # s = "!Fixed!szCs=%s:%s!bCs=%s!" % (szCs, run.text, run.element.rPr.bCs.attrib.values()[0])
+            s = "!Fixed!szCs=%s:%s!" % (szCs, run.text)
             # print s
             debug_file.write(s.encode('utf8') + ' ')
+            # return 'definition_normal'
             return 'subject_small'
     elif szCs == "22" and type == 'definition_normal':
         return 'subject_normal'
+    elif szCs == "22" and type == 'sub-subject_normal':
+        return 'subject_normal'
     elif szCs == "16" and type == 'source_normal':
         return 'source_small'
+    elif szCs == "18" and type == 'definition_normal':
+        return 'source_normal'
+    elif szCs == "18" and type == 'sub-subject_normal':
+        # return 'sub-subject_normal'             #20.11.16 - Trying to fix Appendix' bold and fonts
+        return 'sub-subject_small'
+    elif szCs == "18" and type == 'subject_small':
+        return 'sub-subject_small'
+    elif szCs == "18" and type == 'subject_normal':
+        return 'definition_small'
+    elif szCs == "20" and type == 'unknown_light':
+        return 'definition_normal'
+    elif run.text.strip():
+        # print "fix_sz_cs::Unsupported value: ", szCs, "type:", type, ". At: ", run.text    #TODO: clean this!!!
+        pass
     else:
         pass
     return result
@@ -596,9 +650,26 @@ def fix_b_cs(run, type):
     result = type
     try:
         bCs = run.element.rPr.bCs.attrib.values()[0]
+        try:
+            hint_cs = run.element.rPr.rFonts.attrib.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}hint', None) == 'cs'
+        except:
+            hint_cs = False
+
+        try:
+            szCs = run.element.rPr.szCs.attrib.values()[0]
+        except:
+            szCs = None
+
+        try:
+            fonts = run.element.rPr.rFonts.attrib.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}cs', None)
+        except:
+            fonts = None
+
         if bCs == "0" and 'subject' in type:
-            if type in ('subject_small', 'sub-subject_normal'):
-                return 'definition_normal'
+            if (run.style.style_id == "s01" and fonts != "Narkisim" and (run.bold != True or hint_cs or szCs == '20')) or \
+                  (run.style.style_id == "s11" and (run.bold != True or (bCs == '0' and fonts != "Narkisim"))):
+                if type in ('subject_small', 'sub-subject_normal'):
+                    return 'definition_normal'
             else:
                 pass
                 # print "Unknown b_cs=0"
@@ -618,31 +689,39 @@ def fix_unknown(run):
     elif run.font.size == 88900 and run.style.style_id == 's04':
         return 'source_light'
     else:
+        print "UNKNOWN: ", run.text
         return 'unknown_light'
 
 
 def fix_DefaultParagraphFont(run):
     # only if it's really a text
-    if run.text.strip() and run.text.strip() not in ("-", "(", ")", "[", "]", "'", '"', ","):
-        if run.font.size == 152400 and not run.bold:
-            return 'subject_normal'
-        if run.font.size == 139700 and run.bold:
+    if run.text.strip():
+        if run.font.size == 152400 and run.font.cs_bold:
+            return 'sub-subject_normal'
+        elif run.font.size == 152400 and not run.font.cs_bold:
+            return 'definition_normal'
+        elif run.font.size == 139700 and run.font.cs_bold:
             return 'subject_normal'
         elif run.font.size == 127000:
             return 'definition_normal'
-        elif run.font.size == 114300:
+        elif run.font.size == 114300 and run.font.cs_bold:
+            return 'sub-subject_normal'
+        elif run.font.size == 114300 and not run.font.cs_bold:
             return 'source_normal'
         elif run.font.size == 101600:
             return 'source_small'
         elif run.font.size == 88900:
             return 'source_small'
-        elif run.font.size is None and run.bold:
+        elif run.font.size is None and run.font.cs_bold:
             return 'sub-subject_normal'
-        elif run.font.size is None and not run.bold:
+        elif run.font.size is None and not run.font.cs_bold:
             return 'definition_normal'
         else:
-            print "AH!", ":",run.text.strip(),".", run.font.size, run.bold
-            assert False
+            if run.text.strip() not in ("-", "(", ")", "[", "]", "'", '"', ","):
+                print "AH!", ":",run.text.strip(),".", run.font.size, run.bold, run.font.cs_bold
+                assert False
+            else:
+                return 'DefaultParagraphFont'
     else:
         return 'DefaultParagraphFont'
 
@@ -761,7 +840,7 @@ def close_html_doc(html_doc):
             for (id) in html_doc.footnote_ids_of_this_html_doc:
                 footnote = word_doc_footnotes.footnotes_part.notes[id + 1]
                 assert footnote.id == id
-                add_footnote_to_output(footnote.paragraphs)
+                htmler.add_footnote_to_output(footnote.paragraphs)
 
         # add placeholder for searching
         tags.comment("search_placeholder")
@@ -773,12 +852,12 @@ def close_html_doc(html_doc):
     html_doc_name = html_doc.index
     name = "debug_%s.html" % html_doc_name
     with open("output/" + name, 'w') as f:
-        f.write(html_doc.render(inline=False).encode('utf8'))
+        f.write(html_doc.render(pretty=True).encode('utf8'))
     replace_in_file("output/" + name, place_holder, search_html)
 
     name = "%s.html" % html_doc_name
     with open("output/" + name, 'w') as f:
-        f.write(html_doc.render(inline=True).encode('utf8'))
+        f.write(html_doc.render(pretty=False).encode('utf8'))
         print "Created ", name
     replace_in_file("output/" + name, place_holder, search_html)
 
@@ -787,11 +866,11 @@ heading_back_to_back = False
 pattern = re.compile(r"\W", re.UNICODE)
 
 # returns:
-#  None - if no need for new html_doc
-#  string - with name of new required html_doc
-#  ('UPDATE_NAME', string) - to replace the name of newly opend html_doc
-#  ('NEW_LETTER', string) - if needs a new html_doc, but w/o putting it in the main TOC
-def is_need_new_html_doc(para):
+#  None - if no need for new section
+#  string - with name of new required section
+#  ('UPDATE_NAME', string) - to replace the name of newly opend section
+#  ('NEW_LETTER', string) - if needs a new section, but w/o putting it in the main TOC
+def is_need_new_section(para, prev_name):
     global heading_back_to_back
     for (type, text) in para:
         if type in ("heading_title", "heading_section"):
@@ -800,8 +879,8 @@ def is_need_new_html_doc(para):
                 return text.strip()
             else:
                 # the previous, and this, are headings - unite them
-                if html_docs_l[-1].name != u"מדורים":
-                    result = html_docs_l[-1].name + " " + text.strip()
+                if prev_name != u"מדורים":
+                    result = prev_name + " " + text.strip()
                 else:
                     # in the special case of 'Section' heading - we don't need it
                     result = text.strip()
@@ -812,7 +891,7 @@ def is_need_new_html_doc(para):
     # if we're here - we didn't 'return text' with a heading
     heading_back_to_back = False
 
-def fix_html_doc_name(name):
+def fix_section_name(name):
     if name == u"מילון הראיה":
         return u"ערכים כלליים"
     else:
@@ -820,7 +899,11 @@ def fix_html_doc_name(name):
 
 html_docs_l = []
 def get_active_html_doc(para):
-    name = is_need_new_html_doc(para)
+    try:
+        prev_name = html_docs_l[-1].name
+    except:
+        prev_name = None
+    name = is_need_new_section(para, prev_name)
     if name:
         if isinstance(name, tuple):
             op, new = name
@@ -832,118 +915,11 @@ def get_active_html_doc(para):
                 html_docs_l[-1].name = new
                 html_docs_l[-1].section = new
         else:
-            fixed_name = fix_html_doc_name(name)
+            fixed_name = fix_section_name(name)
             html_docs_l.append(open_html_doc(fixed_name))
     return html_docs_l[-1]
 
 
-def open_latex():
-    pass
-    # nothing to do here...
-
-
-
-def latex_type(type):
-    if type == "subject_normal":
-        return u"ערך"
-    elif type in ("sub-subject_normal", "subject_small", "fake_subject_small", "fake_sub-subject_normal"):
-        return u"משנה"
-    elif type in ("definition_normal", "fake_subject_small_normal"):
-        return u"הגדרה"
-    elif type == "source_normal":
-        return u"מקור"
-    elif type == "sub-subject_small":
-        return u"צמשנה"
-    elif type == "definition_small":
-        return u"צהגדרה"
-    elif type == "source_small":
-        return u"צמקור"
-    elif type == "footnote":
-        return "footnote"    #TODO: improve footnote
-    elif type == "s02Symbol":
-        return u"מעוין"
-    #elif type == "DefaultParagraphFont":
-    #    return #TODO: what??
-    else:
-        return u"תקלה"
-
-
-
-latex_new_lines_in_raw = 0
-def add_to_latex(para):
-    global latex_new_lines_in_raw
-    data = ""
-    for (i, (type, text)) in enumerate(para):
-        if 'heading' in type and text.strip():
-            data += "\\end{multicols}\n"
-
-            # TODO: adjust headings
-            if type == 'heading_title':
-                data += ("\\chapter{%s}" % text)
-                data += ("\\addPolythumb{%s}" % text)
-            elif type == 'heading_section':
-                data += ("\\chapter{%s}" % text)
-                data += ("\\addPolythumb{%s}" % text)
-            elif type == 'heading_sub-section-bigger':
-                data += ("\\subsection{%s}" % text)
-            elif type == 'heading_sub-section':
-                data += ("\\subsection{%s}" % text)
-            elif type == 'heading_letter':
-                data += ("\\subsubsection{%s}" % text)
-                data += ("\\replacePolythumb{%s}" % text)
-
-            data += "\n"
-            if 'letter' in type:
-                data += u"\\fancyhead[CO]{אות %s}\n" % text
-            else:
-                data += "\\fancyhead[CE,CO]{%s}\n" % text
-
-            data += "\\begin{multicols}{2}\n"
-
-
-        elif type == "new_line":
-            latex_new_lines_in_raw += 1
-            if latex_new_lines_in_raw == 1:
-                if data:
-                    data += ("\\\\")
-            elif latex_new_lines_in_raw == 2:
-                data += ("\n\n")
-            else:
-                pass
-
-        elif type == "footnote":
-            id = int(text)
-            footnote = word_doc_footnotes.footnotes_part.notes[id + 1]
-            assert footnote.id == id
-            foot_text = ""
-            for (para) in footnote.paragraphs:
-                foot_text += para.text
-
-            data += ("\\%s{%s}" % (type, foot_text))
-
-        # elif is_subject(para, i):
-        #     if not is_prev_subject(para, i):
-        #         # tags.p()
-        #         #tags.br()
-        #         pass
-        #     subject(html_doc, type, text)
-        else:
-            # regular(type, text)
-            data += ("\\%s{%s}" % (latex_type(type), text))
-
-        if type != "new_line":
-            latex_new_lines_in_raw = 0
-                
-    with open("tex\content.tex", 'a') as latex_file:
-        latex_file.write(data.encode('utf8'))
-
-def close_latex():
-    os.chdir("tex")
-    # twice because of thumb-indices
-    subprocess.call(['xelatex', 'milon.tex'])
-    subprocess.call(['xelatex', 'milon.tex'])
-    os.startfile("milon.pdf")
-    os.chdir("..")
 
 
 
@@ -989,12 +965,13 @@ os.chdir("../input_tex")
 for (f) in (
     "milon.tex",
     "polythumbs.sty",
+    "hebrew-gymatria-fix.sty",
 ):
     shutil.copyfile(f, os.path.join("../tex", f))
 os.chdir("../")
 
 
-open_latex()
+texer.open_latex()
 # Here starts the action!
 with open('output/debug.txt', 'w') as debug_file:
     for (paragraph, footnote_paragraph) in zip(word_doc.paragraphs, word_doc_footnotes.paragraphs):
@@ -1011,7 +988,7 @@ with open('output/debug.txt', 'w') as debug_file:
                 if run.font.size and run.text.strip():
                     size_kind = sizes.match(run.font.size)
                     if size_kind == 'unknown':
-                        print "!%s. Size: %d, Bool: %s, %s:%s$" % (size_kind, run.font.size, run.bold, type, run.text)
+                        print "!%s. Size: %d, Bool: %s, %s:%s$" % (size_kind, run.font.size, run.font.cs_bold, type, run.text)
                     if size_kind not in ('normal', 'unknown'):
                         type = size_kind
 
@@ -1022,7 +999,8 @@ with open('output/debug.txt', 'w') as debug_file:
                     type = fix_DefaultParagraphFont(run)
                     # print paragraph.style.style_id, run.bold, run.font.size, s
 
-                elif run.bold:
+                # elif run.bold:          #20.11.16 - Trying to fix 'fake' bold in Appendix
+                elif run.font.cs_bold:
                     type = bold_type(s, type, run)
 
                 # single run & alignment is CENTER and ...-> letter heading
@@ -1040,10 +1018,10 @@ with open('output/debug.txt', 'w') as debug_file:
                     if run.element.rPr.bCs is not None and run.text.strip():
                         type = fix_b_cs(run, type)
 
-                    # this footnote number need no fix.
-                    # it is a reoccuance, therefore it has no id.
-                    if is_footnote_reoccurance(run, type):
-                        type = 'footnote_reoccurance'
+                    # NOTE: this footnote number need no fix.
+                    # it is a recurrence, therefore it has no id.
+                    if is_footnote_recurrence(run, type):
+                        type = 'footnote_recurrence'
             
                 except:
                     pass
@@ -1085,7 +1063,7 @@ with open('output/debug.txt', 'w') as debug_file:
                 html_doc = get_active_html_doc(para)
                 add_to_output(html_doc, para)
             if create_latex:
-                add_to_latex(para)
+                texer.add_to_latex(para, word_doc_footnotes)
         else:
             try:
                 # if there is a 'html_doc' - add to id new_line for the paragraph ended
@@ -1096,7 +1074,7 @@ with open('output/debug.txt', 'w') as debug_file:
                     html_doc = html_docs_l[-1]
                     add_to_output(html_doc, para)
                 if create_latex:
-                    add_to_latex(para)
+                    texer.add_to_latex(para, word_doc_footnotes)
             except:
                 pass
 
@@ -1119,7 +1097,7 @@ def add_menu_to_apriory_htmls(html_docs_l):
 
     place_holder = "<!--menu_bar-->"
 
-    menu_bar_html = menu_bar.render(inline=True).encode('utf8')
+    menu_bar_html = menu_bar.render(pretty=False).encode('utf8')
 
     with open("input_web/stub_search.html", 'r') as file:
         menu_bar_html += file.read()
@@ -1134,7 +1112,7 @@ def add_menu_to_apriory_htmls(html_docs_l):
             "opening_signs.html",
     )):
         content[index].attributes['class'] = 'active'
-        menu_bar_html = menu_bar.render(inline=True).encode('utf8')
+        menu_bar_html = menu_bar.render(pretty=False).encode('utf8')
         with open("input_web/stub_search.html", 'r') as file:
             menu_bar_html += file.read()
 
@@ -1150,7 +1128,7 @@ if create_html:
         close_html_doc(html_doc)
 
 if create_latex:
-    close_latex()
+    texer.close_latex()
 
 with open('output/subjects_db.json', 'wb') as fp:
     s = json.dumps(subjects_db, encoding='utf8')
@@ -1162,25 +1140,58 @@ if unknown_list:
     print unknown_list
 
 
-with zipfile.ZipFile("milon.zip", "w", zipfile.ZIP_DEFLATED) as zf:
-    os.chdir("output")
-    for dirname, subdirs, files in os.walk("."):
-        # avoid creating 'output' directory as first hierrarchy
-        # suddenly causes problem with phonegap - makes garbages APKs...
-        zf.write(dirname)
-        for filename in files:
-            if not 'debug' in filename:
-                zf.write(os.path.join(dirname, filename))
-    print "Created milon.zip"
-os.chdir("..")
+def create_zip():
+    with zipfile.ZipFile("milon.zip", "w", zipfile.ZIP_DEFLATED) as zf:
+        os.chdir("output")
+        for dirname, subdirs, files in os.walk("."):
+            # avoid creating 'output' directory as first hierrarchy
+            # suddenly causes problem with phonegap - makes garbages APKs...
+            zf.write(dirname)
+            for filename in files:
+                if not 'debug' in filename and not '.apk' in filename:
+                    zf.write(os.path.join(dirname, filename))
+        print "Created milon.zip"
+    os.chdir("..")
+    shutil.move("milon.zip", "output/")
 
-shutil.move("milon.zip", "output/")
+
+try:
+    # 18.11.18 - update - removed CrossWalk, and now the version seem to be *not* multiplied by 10
+    # trying to remove the " / 10"
+    # old comment:
+    # # because of "https://github.com/MBuchalik/cordova-build-architecture.git#v1.0.1"
+    # # the version code we give here is multiplied by 10, and adds either 2 or 4 (for ARM or Intel)
+    # # here we do the opposite, and advance the version
+
+    playAPISession = upload_google_play.PlayAPISession()
+    # version_code = playAPISession.get_last_apk() / 10 + 1
+    version_code = playAPISession.get_last_apk() + 1
+    replace_in_file('output/config.xml', 'UPDATED_BY_SCRIPT_VERSION_CODE', str(version_code))
+except Exception as e:
+    print "Couldn't connect to Google Play - .apk version not updated!"
+    print e
+
+create_zip()
+
+def update_zip_to_x86():
+    os.remove('output/milon.zip')
+    replace_in_file('output/config.xml', '!--UPDATED_BY_SCRIPT ', '')
+    replace_in_file('output/config.xml', '/UPDATED_BY_SCRIPT--', '/')
+    create_zip()
 
 if process != "ZIP":
     try:
-        build_phonegap.push_to_phonegap("output/milon.zip")
+        # build_phonegap.push_to_phonegap("output/milon.zip", 'arm')
+        # update_zip_to_x86()
+        # build_phonegap.push_to_phonegap("output/milon.zip", 'x86')
+
+        # 18.11.18 - trying back to dual APK:
+        build_phonegap.push_to_phonegap("output/milon.zip", 'dual')
         if process == "Full":
-            upload_google_play.main()
+            playAPISession = upload_google_play.PlayAPISession()
+            # playAPISession.main(["output/milon.x86.apk", "output/milon.arm.apk"])
+            playAPISession.main(["output/milon.dual.apk"])
+
     except Exception as e:
         print "Build process failed!"
         print e

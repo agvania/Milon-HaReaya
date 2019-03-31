@@ -11,34 +11,42 @@
   <body>
     <div class="container-fluid"><script>page_loaded('3.html')</script>
       <div class="fixed_top_left" id="menu_bar">
-        <div class="form-group">
-          <div class="input-group">
-            <input class="form-control" id="subject_search" onblur="search_focused(false)" onchange="search()" onfocus="search_focused(true)" placeholder="חפש" type="search">
-            <span class="input-group-addon" id="search_icon">
-              <button onclick="search()" type="button">
-                <span class="glyphicon glyphicon-search"></span>
-              </button>
-            </span>
-            <span class="input-group-addon">
-              <div class="dropdown">
-                <button href="#" type="button">
-                  <span class="glyphicon glyphicon-menu-hamburger"></span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-left scrollable-menu">
-                  <li>
-                    <a href="index.html">אודות</a>
-                  </li>
-                  <li class="divider"></li>
-                  <li>
-                    <a href="1.html">כללי</a>
-                  </li>
-                  <li class="active">
-                    <a href="3.html">מונחי קבלה ונסתר</a>
-                  </li>
-                </ul>
-              </div>
-            </span>
-          </div>
+        <div>
+          <button class="btn btn-default" id="search_icon_button" type="button">
+            <span class="glyphicon glyphicon-search"></span>
+          </button>
+          <span class="dropdown">
+            <button class="btn btn-primary" href="#" type="button">
+              <span class="glyphicon glyphicon-menu-hamburger"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-left scrollable-menu">
+              <li>
+                <a href="index.html">אודות</a>
+              </li>
+              <li>
+                <a href="opening_intros.html">הקדמות</a>
+              </li>
+              <li>
+                <a href="opening_haskamot.html">הסכמות</a>
+              </li>
+              <li>
+                <a href="opening_abbrev.html">קיצורים</a>
+              </li>
+              <li>
+                <a href="opening_signs.html">סימנים</a>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a href="1.html">ערכים כלליים</a>
+              </li>
+              <li>
+                <a href="5.html">מדרגות והערכות אישיותיות</a>
+              </li>
+              <li class="active">
+                <a href="3.html">מונחי קבלה ונסתר</a>
+              </li>
+            </ul>
+          </span>
         </div>
       </div>
       <h2>מונחי קבלה ונסתר</h2>
@@ -82,8 +90,7 @@
       <br>
       <p></p>
       <span class="subject_normal" id="האדרת-שם-ד'">האדרת שם ד'</span>
-      <span class="DefaultParagraphFont"> -</span>
-      <span class="definition_normal"> גלוי </span>
+      <span class="definition_normal"> - גלוי </span>
       <span class="definition_normal">
         <span>עז°</span>
       </span>
@@ -215,9 +222,13 @@
         <span>נשמת־העולמים°</span>
       </span>
       <span class="definition_normal"> </span>
-      <span class="fake_sub-subject_small">[קבצ' ב קנה</span>
+      <span class="definition_small">[קבצ' ב קנה</span>
       <span class="fake_sub-subject_normal">]</span>
       <span class="definition_small">.</span>
+      <br>
+      <p></p>
+      <span class="subject_normal" id="&quot;תשובה-קדמה-לעולם&quot;">&quot;תשובה קדמה לעולם&quot; </span>
+      <span class="definition_normal">- ע' במדור פסוקים ובטויי חז&quot;ל. ושם, קדמה לעולם.</span>
       <br>
       <p></p>
       <span class="subject_normal" id="אב1">אב </span>
@@ -240,12 +251,8 @@
         <span>שהקדושה°</span>
       </span>
       <span class="definition_normal"> המעלה את הנטיות הנפשיות, פועלת להגביל יפה את סדרי הפעולות הטבעיות לצד המעלה והקדושה</span>
-      <span class="DefaultParagraphFont"> [</span>
-      <span class="definition_normal">ע</span>
-      <span class="DefaultParagraphFont">&quot;</span>
-      <span class="definition_normal">א ג ב ד</span>
-      <span class="DefaultParagraphFont">]</span>
-      <span class="definition_normal">.</span>
+      <span class="source_normal"> [ע&quot;א ג ב ד]</span>
+      <span class="definition_small">.</span>
       <br>
       <span class="definition_normal">ע&quot;ע חגורה, יסוד הויתה.</span>
       <br>
@@ -266,7 +273,7 @@
       <a class="ptr">(1)</a>
       <span class="definition_normal"> - שע&quot;י </span>
       <span class="definition_normal">
-        <span>הקדושה°</span>
+        <a href="2.html#קדושה">הקדושה°</a>
       </span>
       <span class="definition_normal"> הנמשכת עליו </span>
       <span class="definition_normal">
@@ -291,7 +298,7 @@
       <span class="s02Symbol">◊</span>
       <span class="definition_normal"> </span>
       <span class="definition_normal">
-        <span>האמונה°</span>
+        <a href="2.html#אמונה">האמונה°</a>
       </span>
       <span class="definition_normal"> והאהבה הן עצם החיים בעוה&quot;ז </span>
       <span class="definition_normal">
@@ -303,8 +310,7 @@
       <br>
       <p></p>
       <span class="sub-subject_normal" id="באהבה">באהבה</span>
-      <span class="DefaultParagraphFont"> - </span>
-      <span class="definition_normal">בדרך חפץ פנימי והכרה עצמית </span>
+      <span class="definition_normal"> - בדרך חפץ פנימי והכרה עצמית </span>
       <span class="source_normal">[ל&quot;ה 55]</span>
       <span class="definition_small">. </span>
       <br>
@@ -326,7 +332,7 @@
       <span class="definition_normal">ע&quot;ע עבודה מאהבה, עבודת ד' מאהבה ותלמוד תורה־לשמה.</span>
       <br>
       <p></p>
-      <span class="subject_normal" id="אמר">אמר </span>
+      <span class="subject_normal" id="אמר1">אמר </span>
       <span class="definition_normal">לו </span>
       <span class="fake_subject_normal">הקדוש ברוך הוא </span>
       <span class="definition_normal"></span>
@@ -340,8 +346,7 @@
       <span class="definition_normal"> מכבשן האש) </span>
       <span class="fake_subject_normal">אני יחיד בעולמי והוא יחיד בעולמו, נאה ליחיד להציל את היחיד</span>
       <a class="ptr">(2)</a>
-      <span class="fake_subject_small"> </span>
-      <span class="definition_normal">- אברהם כדאי הוא בזכותו שיושפע עליו זה השפע של השווית רצונו עם רצוני, שישכיל בכל כוחותיו, ויושפע זה גם על נפשו המרגשת והצומחת, לדעת שאין שום דבר ראוי לרצון כ&quot;א רצונו של הקב&quot;ה, וממילא הכל מתייחדים בהשווי' אחת, ואין כאן ניגוד - </span>
+      <span class="definition_normal"> - אברהם כדאי הוא בזכותו שיושפע עליו זה השפע של השווית רצונו עם רצוני, שישכיל בכל כוחותיו, ויושפע זה גם על נפשו המרגשת והצומחת, לדעת שאין שום דבר ראוי לרצון כ&quot;א רצונו של הקב&quot;ה, וממילא הכל מתייחדים בהשווי' אחת, ואין כאן ניגוד - </span>
       <span class="fake_subject_small">נאה ליחיד להציל את היחיד </span>
       <span class="source_normal">[עפ&quot;י פנק' ג ריג]</span>
       <span class="definition_small">.</span>
@@ -376,9 +381,85 @@
       <div class="modal fade" id="search_modal"></div>
     </div>
     <ol id="footnotes">
-      <li> מדרש תהילים קיז.</li>
-      <li> פסחים קיח:</li>
-      <li> אתרא דיראה עילאה, השלמות האלהית הנוראה - ע' זוהר ח&quot;ב עט.</li>
+      <li>
+        <span class="definition_small"></span>
+        <span class="definition_small"> מדרש תהילים </span>
+        <span class="definition_small">קיז</span>
+        <span class="definition_small">.</span>
+        <br>
+      </li>
+      <li>
+        <span class="definition_small"></span>
+        <span class="definition_small"> </span>
+        <span class="definition_small">פסחים </span>
+        <span class="definition_small">קיח</span>
+        <span class="definition_small">:</span>
+        <br>
+      </li>
+      <li>
+        <span class="definition_small"></span>
+        <span class="definition_small"> </span>
+        <span class="sub-subject_small">אתרא</span>
+        <span class="sub-subject_small"> </span>
+        <span class="sub-subject_small">דיראה</span>
+        <span class="sub-subject_small"> </span>
+        <span class="sub-subject_small">עילאה</span>
+        <span class="sub-subject_small">, השלמות </span>
+        <span class="sub-subject_small">האלהית</span>
+        <span class="sub-subject_small"> הנוראה</span>
+        <span class="definition_small"> - ע' זוהר </span>
+        <span class="definition_small">ח&quot;ב</span>
+        <span class="definition_small"> עט.</span>
+        <br>
+      </li>
     </ol>
+    ﻿  <!-- Modal -->
+  <div class="modal fade" id="searchDialogModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+	   <form>
+        <div class="modal-body" style="padding:10px 14px;">
+			<div class="form-group">
+  			    <label for="subject_search">חיפוש ברשימת הערכים <span class="glyphicon glyphicon-search"></span></label>
+			    <input type="search" class="form-control" id="subject_search" placeholder="ביטוי לחיפוש ברשימת הערכים" autofocus>
+			</div>
+			<div class="form-group" >
+				<div class="input-group">
+					<div class="radio">
+						<label><input type="radio" name="searchRadio" id="exact_expr">חיפוש שם ערך מדויק</label>
+					</div>
+					<div class="radio">
+						<label><input type="radio" name="searchRadio" id="whold_word" checked="checked">חיפוש מילה שלמה, שמופיעה בשם הערך</label>
+					</div>				
+					<div class="radio">
+						<label><input type="radio" name="searchRadio" id="partial">חיפוש רצף אותיות משם הערך</label>
+					</div>				
+				</div>				
+			</div>				
+
+        </div>
+        <div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal">סגור</button>
+			<button type="submit" onclick="search()" class="btn btn-primary" data-dismiss="modal">חיפוש</button>
+        </div>
+       </form>
+	  </div>
+      
+    </div>
+
+  </div>
+
+  <script>
+  $(document).ready(function(){
+      $("#search_icon_button").click(function(){
+          $("#searchDialogModal").modal();
+      });
+  });
+  </script>
+  
+				
+
   </body>
 </html>

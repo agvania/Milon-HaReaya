@@ -1,3 +1,11 @@
+a {
+  /* from https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
+  On devices with small screen, the index.html would get horizontal Scroll Bar.
+  It appears because of links getting out of line.
+  This one forces them to wrap around */
+  word-wrap: break-word;
+}
+
 .my_background {
     /*background-color:  !important;*/
     background-color: #4d79ff;
@@ -22,6 +30,10 @@ to fix the bug that menu stays open, and lose focus, when users scrolls text beh
     margin-top: 0; /* remove the gap so it doesn't close*/
 }
 
+
+/* from http://stackoverflow.com/questions/18580203/bootstrap-modal-window-is-grayed-out
+to fix the bug that Search Modal appeared grayed out */
+.modal-backdrop.in { z-index: auto;}
 
 .scrollable-menu {
     height: 400px;
@@ -104,7 +116,7 @@ a {
     font-weight: bold;
 }
 
-.sub-subject_normal, .subject_small {
+.sub-subject_normal, .subject_small, .fake_subject_normal {
     font-size: 1.15em;
     font-weight: bold;
 }
@@ -127,6 +139,10 @@ a {
     font-weight: bold;
 }
 
+.fake_sub-subject_small {
+    font-size: 0.9em;
+    font-weight: bold;
+}
 
 .definition_small {
     font-size: 0.9em;
